@@ -5,5 +5,6 @@ from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
     path('test', views.Test.as_view(), name='test'),
-    # path('transaction/new', views.TransactionNew.as_view(), name='transaction_new'),
+    path('transaction/types', views.TransactionTypes.as_view(), name='transaction_types'),
+    path('transaction/new', views.TransactionNew.as_view(), name='transaction_new'),
 ]
