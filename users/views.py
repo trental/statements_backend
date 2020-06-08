@@ -60,3 +60,30 @@ class UserData(APIView):
             id=request.user.id,
         ).delete()
         return Response({'message':'user deleted'})
+
+    def put(self, request):
+
+        user = User.objects.get(id=request.user.id)
+
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        username = body.get('username', None)
+        usermail = body.get('email', None)
+        userfirst = body.get('firstName', None)
+        userlast = body.get('lastName', None)
+        userpass = body.get('password', None)
+
+        result = {'result':'not all data provided'}
+
+        if username and usermail and userfirst and userlast and userpass:
+
+            user = User.objects.get(id=request.user.id)
+            user.set_password(userpass)
+            user.first_name = userfirst
+            user.last_name = userlast
+            user.email = usermail
+            user.save()
+            result = {'result':'user updated'}
+
+        return Response(result)    
