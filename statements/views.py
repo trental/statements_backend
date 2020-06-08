@@ -2,11 +2,14 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated
 import json
 from django.db import connection
 from .models import Transaction
+from rest_framework.permissions import AllowAny
 
 class Test(APIView):
+    permission_classes = (AllowAny,)
     
     def get(self, request):
         print(request.user.id)
