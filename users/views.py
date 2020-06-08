@@ -18,8 +18,8 @@ class NewUser(APIView):
 
         username = body.get('username', None)
         usermail = body.get('email', None)
-        userfirst = body.get('firstName', None)
-        userlast = body.get('lastName', None)
+        userfirst = body.get('firstname', None)
+        userlast = body.get('lastname', None)
         userpass = body.get('password', None)
 
         result = {'result':'not all data provided'}
@@ -47,8 +47,8 @@ class UserData(APIView):
         result = {}
         for t in list(user):
             result['username'] = t.username
-            result['firstName'] = t.first_name
-            result['lastName'] = t.last_name
+            result['firstname'] = t.first_name
+            result['lastname'] = t.last_name
             result['email'] = t.email
             result['lastLogin'] = t.last_login
             result['dateJoined'] = t.date_joined
@@ -70,8 +70,8 @@ class UserData(APIView):
 
         username = body.get('username', None)
         usermail = body.get('email', None)
-        userfirst = body.get('firstName', None)
-        userlast = body.get('lastName', None)
+        userfirst = body.get('firstname', None)
+        userlast = body.get('lastname', None)
         userpass = body.get('password', None)
 
         result = {'result':'not all data provided'}
