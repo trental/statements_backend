@@ -8,4 +8,6 @@ urlpatterns = [
     # path('user/new', views.UserNew.as_view(), name='user_new'),
     path('transaction/types', views.TransactionTypes.as_view(), name='transaction_types'),
     path('transaction/new', views.TransactionNew.as_view(), name='transaction_new'),
+    path('transaction/<int:pk>', views.TransactionData.as_view(), name='transaction_data'),
+    path('transaction', views.TransactionList.as_view(), name='transaction_list'),
 ]
