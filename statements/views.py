@@ -39,6 +39,26 @@ class StatementList(APIView):
         if 'transaction_list' in body:
             transaction_list = 'and ut.id in (' + str(body['transaction_list'])[1:-1] + ')'
         print(statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
+
+        
+        cursor = connection.cursor()
+        
+        # results will dump into temp table "output"
+        cursor.execute('create temp table output as ' + statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
+
+        cursor.execute('select * from output;') 
+
+        data = cursor.fetchall()
+
+        for t in list(data):
+            print(t)
+            if t[0] not in result:
+                result[t[0]] = []
+            result[t[0]].append({'line_item_order':t[1], 'line_item':t[2], 'amount':t[3]})
+
+        cursor.close()
+        connection.close()
+
         return Response(result)
 
 class TransactionTypes(APIView):
@@ -77,6 +97,10 @@ class TransactionNew(APIView):
                     cursor.execute(detailSQL.format(newTransaction, transaction_property, transaction_value))
 
             body[transaction_type]['id'] = newTransaction
+
+        cursor.close()
+        connection.close()
+
         return Response(body)
 
 class TransactionData(APIView):
@@ -124,6 +148,9 @@ class TransactionData(APIView):
                         transaction_value = body[t][k]
                         detailSQL = "insert into statements_usertransactiondetail (user_transaction_id, transaction_property, transaction_value) values ({}, '{}', {});"
                         cursor.execute(detailSQL.format(pk, transaction_property, transaction_value))
+
+                cursor.close()
+                connection.close()
 
         return Response(result)    
 
