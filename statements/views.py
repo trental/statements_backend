@@ -7,6 +7,15 @@ import json
 from django.db import connection
 from .models import Transaction, UserTransaction, UserTransactionDetail
 from rest_framework.permissions import AllowAny
+import os
+
+file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql', 'statements.sql'), mode='r')
+statementSQL = file.read()
+file.close()
+
+def snake_to_camel(word):
+        import re
+        return ''.join(x.capitalize() or '_' for x in word.split('_'))
 
 class Test(APIView):
     permission_classes = (AllowAny,)
@@ -14,6 +23,23 @@ class Test(APIView):
     def get(self, request):
         print(request.user.id)
         return Response({'hi':'bye'})
+
+class StatementList(APIView):
+    def get(self, request):
+        result = {}
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        begin_date = '1900-01-01'
+        end_date = '3000-01-01'
+        transaction_list = ''
+        if 'begin_date' in body:
+            begin_date = body['begin_date']
+        if 'end_date' in body:
+            end_date = body['end_date']
+        if 'transaction_list' in body:
+            transaction_list = 'and ut.id in (' + str(body['transaction_list'])[1:-1] + ')'
+        print(statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
+        return Response(result)
 
 class TransactionTypes(APIView):
     
@@ -36,8 +62,8 @@ class TransactionNew(APIView):
         user_id = request.user.id
         for t in body:
             transaction_type = t
-            transaction_date = body[transaction_type]['transactionDate']
-            accounting_date = body[transaction_type]['accountingDate']
+            transaction_date = body[transaction_type]['transaction_date']
+            accounting_date = body[transaction_type]['accounting_date']
             description = body[transaction_type]['description']
             transactionSQL = "insert into statements_usertransaction (transaction_type, transaction_date, accounting_date, description, user_id) values ('{}','{}','{}','{}',{}) returning id;"
             cursor = connection.cursor()
@@ -62,8 +88,8 @@ class TransactionData(APIView):
         if transaction and transaction.user_id == request.user.id:
             result[transaction.transaction_type] = {}
             result[transaction.transaction_type]['id'] = transaction.id
-            result[transaction.transaction_type]['transactionDate'] = transaction.transaction_date
-            result[transaction.transaction_type]['accountingDate'] = transaction.accounting_date
+            result[transaction.transaction_type]['transaction_date'] = transaction.transaction_date
+            result[transaction.transaction_type]['accounting_date'] = transaction.accounting_date
             result[transaction.transaction_type]['description'] = transaction.description
             details = UserTransactionDetail.objects.all().filter(user_transaction_id=transaction.id)
             print(details)

@@ -1,0 +1,52 @@
+{
+	"issue_common_stock": {
+		"transaction_date": "2020-01-01",
+		"accounting_date": "2020-01-01",
+		"capital": "50000",
+		"description": "T0"
+	},
+	"issue_common_stock": {
+		"transaction_date": "2020-01-15",
+		"accounting_date": "2020-01-15",
+		"capital": "1500000",
+		"description": "T1"
+	},
+	"salary_and_employment_expenses": {
+		"transaction_date": "2020-02-01",
+		"accounting_date": "2020-02-01",
+		"salary_paid_general_and_administrative": "3370",
+		"employment_expenses_accrued_general_and_administrative": "2860",
+		"salary_paid_sales_and_marketing": "0",
+		"employment_expenses_accrued_sales_and_marketing": "0",
+		"description": "T2"
+	},
+	"borrow": {
+		"transaction_date": "2020-02-15",
+		"accounting_date": "2020-02-15",
+		"loan_amount": "1000000",
+		"current_debt": "100000",
+		"long_term_debt": "900000",
+		"description": "T3"
+	},
+	"purchase_ppe": {
+		"transaction_date": "2020-03-01",
+		"accounting_date": "2020-03-01",
+		"cost_of_ppe": "1500000",
+		"description": "T4"
+	},
+	"salary_and_employment_expenses": {
+		"transaction_date": "2020-03-15",
+		"accounting_date": "2020-03-15",
+		"salary_paid_general_and_administrative": "4160",
+		"employment_expenses_accrued_general_and_administrative": "2950",
+		"salary_paid_sales_and_marketing": "3800",
+		"employment_expenses_accrued_sales_and_marketing": "3880",
+		"description": "T5"
+	},
+	"pay_accrued_expenses": {
+		"transaction_date": "2020-04-01",
+		"accounting_date": "2020-04-01",
+		"accrued_expenses_paid": "9690",
+		"description": "T6"
+	}
+}

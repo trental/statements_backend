@@ -27,7 +27,6 @@ class StatementDetail(models.Model):
     line_item = models.CharField(max_length=255)
     line_item_order = models.IntegerField()
 
-
 class Transaction_StatementDetail_Bridge(models.Model):
     transaction_property = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='transaction_property_id')
     line_item = models.ForeignKey(StatementDetail, on_delete=models.CASCADE, related_name='line_item_id')

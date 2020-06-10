@@ -1,7 +1,6 @@
 from django.urls import path
 from . import views
 from rest_framework.routers import DefaultRouter
-# from rest_framework_simplejwt import views as jwt_views
 
 urlpatterns = [
     path('test', views.Test.as_view(), name='test'),
@@ -10,4 +9,5 @@ urlpatterns = [
     path('transaction/new', views.TransactionNew.as_view(), name='transaction_new'),
     path('transaction/<int:pk>', views.TransactionData.as_view(), name='transaction_data'),
     path('transaction', views.TransactionList.as_view(), name='transaction_list'),
+    path('statement', views.StatementList.as_view(), name='statement_list'),
 ]
