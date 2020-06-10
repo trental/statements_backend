@@ -86,15 +86,17 @@ class TransactionData(APIView):
         transaction = UserTransaction.objects.get(id=pk)
 
         if transaction and transaction.user_id == request.user.id:
+            # print(transaction.transaction_date)
             result[transaction.transaction_type] = {}
             result[transaction.transaction_type]['id'] = transaction.id
-            result[transaction.transaction_type]['transaction_date'] = transaction.transaction_date
-            result[transaction.transaction_type]['accounting_date'] = transaction.accounting_date
-            result[transaction.transaction_type]['description'] = transaction.description
             details = UserTransactionDetail.objects.all().filter(user_transaction_id=transaction.id)
             print(details)
             for d in list(details):
                 result[transaction.transaction_type][d.transaction_property] = d.transaction_value
+            result[transaction.transaction_type]['transaction_date'] = str(transaction.transaction_date)
+            result[transaction.transaction_type]['accounting_date'] = str(transaction.accounting_date)
+            result[transaction.transaction_type]['description'] = transaction.description
+            
         return Response(result)
 
     def put(self, request, pk):
