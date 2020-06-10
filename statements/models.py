@@ -18,3 +18,11 @@ class UserTransactionDetail(models.Model):
     user_transaction = models.ForeignKey(UserTransaction, on_delete=models.CASCADE, related_name='user_transaction')
     transaction_property = models.CharField(max_length=255)
     transaction_value = models.IntegerField()
+
+class Statement(models.Model):
+    statement_type = models.CharField(max_length=255)
+
+class StatementDetail(models.Model):
+    statement = models.ForeignKey(Statement, on_delete=models.CASCADE, related_name='statement')
+    line_item = models.CharField(max_length=255)
+    line_item_order = models.IntegerField()

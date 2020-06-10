@@ -69,7 +69,6 @@ class TransactionData(APIView):
             print(details)
             for d in list(details):
                 result[transaction.transaction_type][d.transaction_property] = d.transaction_value
-        print(result)
         return Response(result)
 
     def put(self, request, pk):
