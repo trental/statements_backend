@@ -17,7 +17,7 @@ insert into statements_transaction_statementdetail_bridge (sign, line_item_id, t
 (1,(select id from statements_statementdetail where line_item = 'sales_and_marketing'), (select id from statements_transaction where transaction_property = 'employment_expenses_accrued_sales_and_marketing')),
 (1,(select id from statements_statementdetail where line_item = 'accrued_expenses'), (select id from statements_transaction where transaction_property = 'employment_expenses_accrued_sales_and_marketing')),
 (-1,(select id from statements_statementdetail where line_item = 'retained_earnings'), (select id from statements_transaction where transaction_property = 'employment_expenses_accrued_sales_and_marketing')),
-(1,(select id from statements_statementdetail where line_item = 'new_borrowing'), (select id from statements_transaction where transaction_property = 'loan_amount')),
+(1,(select id from statements_statementdetail where line_item = 'net_borrowings'), (select id from statements_transaction where transaction_property = 'loan_amount')),
 (1,(select id from statements_statementdetail where line_item = 'cash'), (select id from statements_transaction where transaction_property = 'loan_amount')),
 (1,(select id from statements_statementdetail where line_item = 'current_portion_of_debt'), (select id from statements_transaction where transaction_property = 'current_debt')),
 (1,(select id from statements_statementdetail where line_item = 'longterm_debt'), (select id from statements_transaction where transaction_property = 'long_term_debt')),

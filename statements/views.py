@@ -11,6 +11,10 @@ import os
 
 file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql', 'statements.sql'), mode='r')
 statementSQL = file.read()
+
+file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql', 'subtotals.sql'), mode='r')
+subtotalSQL = file.read()
+
 file.close()
 
 def snake_to_camel(word):
@@ -46,7 +50,9 @@ class StatementList(APIView):
         # results will dump into temp table "output"
         cursor.execute('create temp table output as ' + statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
 
-        cursor.execute('select * from output;') 
+        cursor.execute('create temp table output_subtotal as ' + subtotalSQL)
+
+        cursor.execute('select * from output_subtotal order by statement_type, line_item_order;') 
 
         data = cursor.fetchall()
 
