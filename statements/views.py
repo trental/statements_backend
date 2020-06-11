@@ -31,17 +31,17 @@ class Test(APIView):
 class StatementList(APIView):
     def get(self, request):
         result = {}
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
+        # body_unicode = request.body.decode('utf-8')
+        # body = json.loads(body_unicode)
         begin_date = '1900-01-01'
         end_date = '3000-01-01'
         transaction_list = ''
-        if 'begin_date' in body:
-            begin_date = body['begin_date']
-        if 'end_date' in body:
-            end_date = body['end_date']
-        if 'transaction_list' in body:
-            transaction_list = 'and ut.id in (' + str(body['transaction_list'])[1:-1] + ')'
+        # if 'begin_date' in body:
+        #     begin_date = body['begin_date']
+        # if 'end_date' in body:
+        #     end_date = body['end_date']
+        # if 'transaction_list' in body:
+        #     transaction_list = 'and ut.id in (' + str(body['transaction_list'])[1:-1] + ')'
         print(statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
 
         
