@@ -138,8 +138,8 @@ class TransactionData(APIView):
         for t in body:
             if transaction and transaction.user_id == request.user.id:
 
-                transaction.transaction_date = body[t]['transactionDate']
-                transaction.accounting_date = body[t]['accountingDate']
+                transaction.transaction_date = body[t]['transaction_date']
+                transaction.accounting_date = body[t]['accounting_date']
                 transaction.description = body[t]['description']
 
                 transaction.save()
@@ -149,7 +149,7 @@ class TransactionData(APIView):
                 cursor = connection.cursor()
 
                 for k in body[t]:
-                    if k not in ['transactionDate', 'accountingDate', 'description', 'id']:
+                    if k not in ['transaction_date', 'accounting_date', 'description', 'id']:
                         transaction_property = k
                         transaction_value = body[t][k]
                         detailSQL = "insert into statements_usertransactiondetail (user_transaction_id, transaction_property, transaction_value) values ({}, '{}', {});"
