@@ -29,7 +29,7 @@ class Test(APIView):
         return Response({'hi':'bye'})
 
 class StatementList(APIView):
-    def get(self, request):
+    def post(self, request):
         result = {}
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
