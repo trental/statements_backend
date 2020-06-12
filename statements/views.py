@@ -21,7 +21,9 @@ def snake_to_camel(word):
         import re
         return ''.join(x.capitalize() or '_' for x in word.split('_'))
 
+
 class Test(APIView):
+
     permission_classes = (AllowAny,)
     
     def get(self, request):
