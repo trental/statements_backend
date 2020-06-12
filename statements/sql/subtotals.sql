@@ -2,9 +2,14 @@ select statement_type, line_item_order, line_item, amount
 from output
 union
 select 'income_statement', 250, 'gross_margin', sum(amount) as amount
-from output
-where statement_type = 'income_statement'
-    and line_item in ('net_sales', 'cost_of_goods_sold')
+from (
+    select case when line_item = 'net_sales' then amount
+                when line_item = 'cost_of_goods_sold' then amount * -1
+                else 0
+        end as amount
+    from output
+    where statement_type = 'income_statement'
+) a
 union
 select 'income_statement', 550, 'operating_expense', sum(amount) as amount
 from output
@@ -14,7 +19,7 @@ union
 select 'income_statement', 575, 'income_from_operations', sum(amount) as amount
 from (
     select case when line_item = 'net_sales' then amount
-                when line_item = 'cost_of_good_sold' then amount * -1
+                when line_item = 'cost_of_goods_sold' then amount * -1
                 when line_item = 'sales_and_marketing' then amount * -1
                 when line_item = 'research_and_development' then amount * -1
                 when line_item = 'general_and_administrative' then amount * -1
@@ -27,11 +32,11 @@ union
 select 'income_statement', 750, 'net_income', sum(amount) as amount
 from (
     select case when line_item = 'net_sales' then amount
-                when line_item = 'cost_of_good_sold' then amount * -1
+                when line_item = 'cost_of_goods_sold' then amount * -1
                 when line_item = 'sales_and_marketing' then amount * -1
                 when line_item = 'research_and_development' then amount * -1
                 when line_item = 'general_and_administrative' then amount * -1
-                when line_item = 'net_interest_income' then amount * -1
+                when line_item = 'net_interest_income' then amount * 1
                 when line_item = 'income_taxes' then amount * -1                
                 else 0
         end as amount
@@ -85,7 +90,7 @@ from (
     where statement_type = 'balance_sheet'
 ) a
 union
-select 'balance_sheet', 37, 'total_assets', sum(amount) as amount
+select 'balance_sheet', 38, 'total_assets', sum(amount) as amount
 from (
     select case when line_item = 'cash' then amount
                 when line_item = 'accounts_receivable' then amount
@@ -99,7 +104,7 @@ from (
     where statement_type = 'balance_sheet'
 ) a
 union
-select 'balance_sheet', 38, 'current_liabilties', sum(amount) as amount
+select 'balance_sheet', 57, 'current_liabilties', sum(amount) as amount
 from (
     select case when line_item = 'accounts_payable' then amount
                 when line_item = 'accrued_expenses' then amount

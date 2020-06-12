@@ -31,8 +31,8 @@ class Test(APIView):
 class StatementList(APIView):
     def get(self, request):
         result = {}
-        # body_unicode = request.body.decode('utf-8')
-        # body = json.loads(body_unicode)
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
         begin_date = '1900-01-01'
         end_date = '3000-01-01'
         transaction_list = ''
@@ -40,8 +40,8 @@ class StatementList(APIView):
         #     begin_date = body['begin_date']
         # if 'end_date' in body:
         #     end_date = body['end_date']
-        # if 'transaction_list' in body:
-        #     transaction_list = 'and ut.id in (' + str(body['transaction_list'])[1:-1] + ')'
+        if 'transaction_list' in body:
+            transaction_list = 'and ut.id in (' + str(body['transaction_list'])[1:-1] + ')'
         print(statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
 
         
@@ -52,7 +52,7 @@ class StatementList(APIView):
 
         cursor.execute('create temp table output_subtotal as ' + subtotalSQL)
 
-        cursor.execute('select * from output_subtotal order by statement_type, line_item_order;') 
+        cursor.execute('select statement_type, line_item_order, line_item, round(amount,0)::integer as amount from output_subtotal order by statement_type, line_item_order;') 
 
         data = cursor.fetchall()
 
@@ -70,7 +70,7 @@ class StatementList(APIView):
 class TransactionTypes(APIView):
     
     def get(self, request):
-        transactions = Transaction.objects.raw('select * from statements_transaction')
+        transactions = Transaction.objects.raw("select * from statements_transaction order by transaction_type, case when transaction_property = 'accounting_date' then 1 when transaction_property = 'transaction_date' then 2 when transaction_property = 'description' then 1000 else 5 end, transaction_property")
         result = {}
         for t in list(transactions):
             if t.transaction_type not in result:
