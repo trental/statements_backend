@@ -1,1 +1,1 @@
-web: gunicorn statements.wsgi
+web gunicorn statements_django.wsgi
