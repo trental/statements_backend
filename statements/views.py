@@ -39,10 +39,10 @@ class StatementList(APIView):
         begin_date = '1900-01-01'
         end_date = '3000-01-01'
         transaction_list = ''
-        # if 'begin_date' in body:
-        #     begin_date = body['begin_date']
-        # if 'end_date' in body:
-        #     end_date = body['end_date']
+        if 'begin_date' in body:
+            begin_date = body['begin_date']
+        if 'end_date' in body:
+            end_date = body['end_date']
         if 'transaction_list' in body:
             transaction_list = 'and ut.id in (' + str(body['transaction_list'])[1:-1] + ')'
         print(statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
@@ -55,7 +55,7 @@ class StatementList(APIView):
 
         cursor.execute('create temp table output_subtotal as ' + subtotalSQL)
 
-        cursor.execute('select statement_type, line_item_order, line_item, round(amount,0)::integer as amount from output_subtotal order by statement_type, line_item_order;') 
+        cursor.execute('select statement_type, line_item_order, line_item, line_format, round(amount,0)::integer as amount from output_subtotal order by statement_type, line_item_order;') 
 
         data = cursor.fetchall()
 
@@ -63,7 +63,7 @@ class StatementList(APIView):
             print(t)
             if t[0] not in result:
                 result[t[0]] = []
-            result[t[0]].append({'line_item_order':t[1], 'line_item':t[2], 'amount':t[3]})
+            result[t[0]].append({'line_item_order':t[1], 'line_item':t[2], 'line_format':t[3], 'amount':t[4]})
 
         cursor.close()
         connection.close()
@@ -73,7 +73,7 @@ class StatementList(APIView):
 class TransactionTypes(APIView):
     
     def get(self, request):
-        transactions = Transaction.objects.raw("select * from statements_transaction order by transaction_type, case when transaction_property = 'accounting_date' then 1 when transaction_property = 'transaction_date' then 2 when transaction_property = 'description' then 1000 else 5 end, transaction_property")
+        transactions = Transaction.objects.raw("select * from statements_transaction order by transaction_type, case when transaction_property = 'accounting_date' then 1 when transaction_property = 'transaction_date' then 2 when transaction_property = 'description' then 3 else 5 end, transaction_property")
         result = {}
         for t in list(transactions):
             if t.transaction_type not in result:
@@ -96,7 +96,7 @@ class TransactionNew(APIView):
             description = body[transaction_type]['description']
             transactionSQL = "insert into statements_usertransaction (transaction_type, transaction_date, accounting_date, description, user_id) values ('{}','{}','{}','{}',{}) returning id;"
             cursor = connection.cursor()
-            cursor.execute(transactionSQL.format(transaction_type, transaction_date, accounting_date, description, str(user_id)))
+            cursor.execute(transactionSQL.format(transaction_type, transaction_date, accounting_date, description.replace("'",""), str(user_id)))
             newTransaction = cursor.fetchone()[0]
             for k in body[transaction_type]:
                 if k not in ['transactionDate', 'accountingDate', 'description']:
@@ -143,7 +143,7 @@ class TransactionData(APIView):
 
                 transaction.transaction_date = body[t]['transaction_date']
                 transaction.accounting_date = body[t]['accounting_date']
-                transaction.description = body[t]['description']
+                transaction.description = str(body[t]['description']).replace("'","")
 
                 transaction.save()
 
@@ -176,7 +176,7 @@ class TransactionList(APIView):
 
     def get(self, request):
         result = []
-        transactions = UserTransaction.objects.all().filter(user_id=request.user.id)
+        transactions = UserTransaction.objects.all().filter(user_id=request.user.id).order_by('accounting_date')
         print(transactions)
         for t in list(transactions):
             el = {}

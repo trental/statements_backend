@@ -1,4 +1,4 @@
-select s.statement_type, sd.line_item_order, sd.line_item, coalesce(user_data.amount,0) as amount
+select s.statement_type, sd.line_item_order, sd.line_item, 'line-item' as line_format, coalesce(user_data.amount,0) as amount
 from statements_statement s
     inner join statements_statementdetail sd
         on s.id = sd.statement_id
