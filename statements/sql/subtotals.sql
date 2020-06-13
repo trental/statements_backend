@@ -139,7 +139,7 @@ from (
     where statement_type = 'balance_sheet'
 ) a
 union
-select 'balance_sheet', 73, 'total_liabilties_and_equity', 'grand-total' as line_format, sum(amount) as amount
+select 'balance_sheet', 73, 'total_liabilities_and_equity', 'grand-total' as line_format, sum(amount) as amount
 from (
     select case when line_item = 'accounts_payable' then amount
                 when line_item = 'accrued_expenses' then amount

@@ -55,7 +55,7 @@ class StatementList(APIView):
 
         cursor.execute('create temp table output_subtotal as ' + subtotalSQL)
 
-        cursor.execute('select statement_type, line_item_order, line_item, line_format, round(amount,0)::integer as amount from output_subtotal order by statement_type, line_item_order;') 
+        cursor.execute("select statement_type, line_item_order, line_item, line_format, case when line_item in ('net_sales', 'net_income', 'cash_receipts', 'ending_cash_balances', 'cash', 'accounts_payable', 'total_liabilities_and_equity') then '$' else '' end as currency_format, round(amount,0)::integer as amount from output_subtotal order by statement_type, line_item_order;") 
 
         data = cursor.fetchall()
 
@@ -63,7 +63,7 @@ class StatementList(APIView):
             print(t)
             if t[0] not in result:
                 result[t[0]] = []
-            result[t[0]].append({'line_item_order':t[1], 'line_item':t[2], 'line_format':t[3], 'amount':t[4]})
+            result[t[0]].append({'line_item_order':t[1], 'line_item':t[2], 'line_format':t[3], 'currency_format':t[4], 'amount':t[5]})
 
         cursor.close()
         connection.close()
