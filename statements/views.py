@@ -9,6 +9,9 @@ from .models import Transaction, UserTransaction, UserTransactionDetail
 from rest_framework.permissions import AllowAny
 import os
 
+file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql', 'statements_a.sql'), mode='r')
+recursive_baseSQL = file.read()
+
 file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql', 'statements.sql'), mode='r')
 statementSQL = file.read()
 
@@ -47,15 +50,17 @@ class StatementList(APIView):
             transaction_list = 'and ut.id in (' + str(body['transaction_list'])[1:-1] + ')'
         print(statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
 
-        
         cursor = connection.cursor()
+
+        cursor.execute('create temp table recursive_base as ' + recursive_baseSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
         
         # results will dump into temp table "output"
-        cursor.execute('create temp table output as ' + statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
+        # cursor.execute('create temp table output as ' + statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
+        cursor.execute('create temp table output as ' + statementSQL)
 
         cursor.execute('create temp table output_subtotal as ' + subtotalSQL)
 
-        cursor.execute("select statement_type, line_item_order, line_item, line_format, case when line_item in ('net_sales', 'net_income', 'cash_receipts', 'ending_cash_balances', 'cash', 'accounts_payable', 'total_liabilities_and_equity') then '$' else '' end as currency_format, round(amount,0)::integer as amount from output_subtotal order by statement_type, line_item_order;") 
+        cursor.execute("select statement_type, line_item_order, line_item, line_format, case when line_item in ('net_sales', 'net_income', 'cash_receipts', 'ending_cash_balances', 'cash', 'accounts_payable', 'total_liabilities_and_equity') then '$' else '' end as currency_format, round(amount,0)::integer as amount, tr_list from output_subtotal order by statement_type, line_item_order;") 
 
         data = cursor.fetchall()
 
@@ -63,7 +68,7 @@ class StatementList(APIView):
             print(t)
             if t[0] not in result:
                 result[t[0]] = []
-            result[t[0]].append({'line_item_order':t[1], 'line_item':t[2], 'line_format':t[3], 'currency_format':t[4], 'amount':t[5]})
+            result[t[0]].append({'line_item_order':t[1], 'line_item':t[2], 'line_format':t[3], 'currency_format':t[4], 'amount':t[5], 'tr_list':json.loads(t[6])})
 
         cursor.close()
         connection.close()

@@ -1,29 +1,30 @@
-select s.statement_type, sd.line_item_order, sd.line_item, 'line-item' as line_format, coalesce(user_data.amount,0) as amount
+select s.statement_type, sd.line_item_order, sd.line_item, 
+    coalesce(user_data.amount,0) as amount,
+    coalesce(concat('[',user_data.tr_list,']'), '[]') as tr_list
 from statements_statement s
     inner join statements_statementdetail sd
         on s.id = sd.statement_id
     left join (
-        select tot.line_item_id, sum(tot.amount) as amount
+        select appended_data.line_item_id, appended_data.amount, appended_data.tr_list
         from (
-            select sd.id as line_item_id, sd.line_item, rp.transaction_value * t_st_b.sign as amount, rp.transaction_date
-            from (
-                select t.id as transaction_property_id, utd.transaction_property, transaction_value, ut.transaction_date
-                from statements_usertransaction ut
-                    inner join statements_usertransactiondetail utd
-                        on ut.id = user_transaction_id
-                    inner join statements_transaction t
-                        on utd.transaction_property = t.transaction_property
-                where ut.user_id = **user_id**
-                    and ut.transaction_date > '**begin_date**' and ut.transaction_date <= '**end_date**'
-                    **transaction_list**
-
-            ) rp
-                inner join statements_transaction_statementdetail_bridge t_st_b
-                    on rp.transaction_property_id = t_st_b.transaction_property_id
-                inner join statements_statementdetail sd
-                    on t_st_b.line_item_id = sd.id
-        ) tot       
-        group by tot.line_item_id
+            with recursive rdata as (
+                select rb.line_item_id, rb.line_item, rb.amount, rb.transaction_id, rb.line_item_seq, 1 as last, 
+                    concat('{"id":',rb.transaction_id::text,', "accounting_date":"', rb.accounting_date, '", "description":"', rb.description, '"}') as tr_list
+                from recursive_base rb
+                where rb.line_item_seq = 1
+                union
+                select rd.line_item_id, rd.line_item, rd.amount + rb.amount as amount, rd.transaction_id, rd.line_item_seq, rd.last + 1 as last, 
+                    concat(rd.tr_list, ', ', '{"id":',rb.transaction_id::text,', "accounting_date":"', rb.accounting_date, '", "description":"', rb.description, '"}') as tr_list
+                from rdata rd
+                    inner join recursive_base rb
+                        on rd.last + 1 = rb.line_item_seq
+                        and rd.line_item_id = rb.line_item_id
+            )
+            select d.*,
+                row_number() over (partition by d.line_item_id order by d.last desc) as rev_seq
+            from rdata d
+        ) appended_data
+        where appended_data.rev_seq = 1
     ) user_data
         on sd.id = user_data.line_item_id
 order by sd.statement_id, sd.line_item_order;
