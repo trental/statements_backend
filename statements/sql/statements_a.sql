@@ -4,7 +4,7 @@ from (
     select t.id as transaction_property_id, utd.transaction_property, transaction_value, ut.transaction_date, ut.id as transaction_id, ut.accounting_date, ut.description
     from statements_usertransaction ut
         inner join statements_usertransactiondetail utd
-            on ut.id = user_transaction_id
+            on ut.id = utd.user_transaction_id
         inner join statements_transaction t
             on utd.transaction_property = t.transaction_property
     where ut.user_id = **user_id**
@@ -17,4 +17,6 @@ from (
         on t_st_b.line_item_id = sd.id
     inner join statements_statement s
         on sd.statement_id = s.id
-where (rp.transaction_date >= '**begin_date**' and s.statement_type in ('income_statement')) or (s.statement_type in ('balance_sheet', 'cash_flow_statement'))
+where (
+    rp.transaction_date >= '**begin_date**' and s.statement_type in ('income_statement', 'cash_flow_statement')) or (s.statement_type in ('balance_sheet')
+)

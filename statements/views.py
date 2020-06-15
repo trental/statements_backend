@@ -79,11 +79,11 @@ class StatementList(APIView):
         
         # results will dump into temp table "output"
         # cursor.execute('create temp table output as ' + statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
-        cursor.execute('create temp table output as ' + statementSQL)
+        cursor.execute('create temp table output as ' + statementSQL.replace('**user_id**', str(request.user.id)).replace('**begin_date**', begin_date).replace('**end_date**', end_date).replace('**transaction_list**', transaction_list))
 
         cursor.execute('create temp table output_subtotal as ' + subtotalSQL)
 
-        cursor.execute("select statement_type, line_item_order, line_item, line_format, case when line_item in ('net_sales', 'net_income', 'cash_receipts', 'ending_cash_balances', 'cash', 'accounts_payable', 'total_liabilities_and_equity') then '$' else '' end as currency_format, round(amount,0)::integer as amount, tr_list from output_subtotal order by statement_type, line_item_order;") 
+        cursor.execute("select statement_type, line_item_order, line_item, line_format, case when line_item in ('net_sales', 'net_income', 'beginning_cash_balance', 'ending_cash_balances', 'cash', 'accounts_payable', 'total_liabilities_and_equity') then '$' else '' end as currency_format, round(amount,0)::integer as amount, tr_list from output_subtotal order by statement_type, line_item_order;") 
 
         data = cursor.fetchall()
 

@@ -62,6 +62,7 @@ from (
                 when line_item = 'net_borrowings' then amount
                 when line_item = 'income_taxes_paid' then amount * -1
                 when line_item = 'sale_of_capital_stock' then amount
+                when line_item = 'beginning_cash_balance' then amount
                 else 0
         end as amount
     from output
