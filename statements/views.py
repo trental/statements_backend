@@ -15,6 +15,9 @@ recursive_baseSQL = file.read()
 file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql', 'statements.sql'), mode='r')
 statementSQL = file.read()
 
+file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql', 'timeperiods.sql'), mode='r')
+periodsSQL = file.read()
+
 file = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql', 'subtotals.sql'), mode='r')
 subtotalSQL = file.read()
 
@@ -33,6 +36,26 @@ class Test(APIView):
     def get(self, request):
         print(request.user.id)
         return Response({'hi':'bye'})
+
+class StatementPeriods(APIView):
+    def post(self, request):
+
+        result = []
+
+        cursor = connection.cursor()
+
+        cursor.execute(periodsSQL)
+        
+        data = cursor.fetchall()
+
+        for t in list(data):
+            print(t)
+            result.append({'period':t[0], 'begin_date':t[1], 'end_date':t[2]})
+
+        cursor.close()
+        connection.close()
+
+        return Response(result)
 
 class StatementList(APIView):
     def post(self, request):

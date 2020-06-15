@@ -10,4 +10,5 @@ urlpatterns = [
     path('transaction/<int:pk>', views.TransactionData.as_view(), name='transaction_data'),
     path('transaction', views.TransactionList.as_view(), name='transaction_list'),
     path('statement', views.StatementList.as_view(), name='statement_list'),
+    path('statement/periods', views.StatementPeriods.as_view(), name='statement_periods'),
 ]
