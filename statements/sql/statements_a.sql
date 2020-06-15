@@ -8,10 +8,13 @@ from (
         inner join statements_transaction t
             on utd.transaction_property = t.transaction_property
     where ut.user_id = **user_id**
-        and ut.transaction_date > '**begin_date**' and ut.transaction_date <= '**end_date**'
+        and ut.transaction_date <= '**end_date**'
         **transaction_list**
 ) rp
     inner join statements_transaction_statementdetail_bridge t_st_b
         on rp.transaction_property_id = t_st_b.transaction_property_id
     inner join statements_statementdetail sd
         on t_st_b.line_item_id = sd.id
+    inner join statements_statement s
+        on sd.statement_id = s.id
+where (rp.transaction_date >= '**begin_date**' and s.statement_type in ('income_statement')) or (s.statement_type in ('balance_sheet', 'cash_flow_statement'))
