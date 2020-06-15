@@ -38,7 +38,7 @@ class Test(APIView):
         return Response({'hi':'bye'})
 
 class StatementPeriods(APIView):
-    def post(self, request):
+    def get(self, request):
 
         result = []
 
