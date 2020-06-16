@@ -19,10 +19,12 @@ select s.*
         select 
             extract(year from accounting_date) as year, concat('Q', round((extract(month from accounting_date) + 0.5)::decimal / 3,0)) as period
         from statements_usertransaction
+        where user_id = **user_id**
         union
         select 
             extract(year from accounting_date) as year, 'Annual' as period
         from statements_usertransaction
+        where user_id = **user_id**
     ) p
 ) s
 order by s.end_date, s.reporting_period desc;

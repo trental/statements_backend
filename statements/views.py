@@ -44,7 +44,7 @@ class StatementPeriods(APIView):
 
         cursor = connection.cursor()
 
-        cursor.execute(periodsSQL)
+        cursor.execute(periodsSQL.replace('**user_id**', str(request.user.id)))
         
         data = cursor.fetchall()
 
