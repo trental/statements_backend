@@ -31,7 +31,7 @@ Three main models exist in Statements:
 2. Transaction (header, detail, and template tables)
 3. Statement (header and detail tables)
 
-> ![Data Design](planning/data_desing.png)
+> ![Data Design](/planning/data_desing.png)
 
 A new user transaction is created from a transaction template. The bridging table between transaction details and statement details allows a N:N relationship between the two tables along with appropriate signing (+1, -1) for summing in each statement. Finally, SQL drives the organization and calculation of reporting including a recursive SQL query that lists each transaction underlying the totals on each financial statement.
 
